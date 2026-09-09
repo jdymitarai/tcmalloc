@@ -46,7 +46,7 @@
 #include "tcmalloc/internal/prefetch.h"
 #include "tcmalloc/internal/sysinfo.h"
 
-#if defined(__GNUC__) && __GNUC__ >= 14 && !defined(__clang__) && \
+#if defined(__GNUC__) && __GNUC__ >= 12 && !defined(__clang__) && \
     defined(__x86_64__)
 // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=125526
 // by force-loading the address of the thread-local rseq_cs_addr into

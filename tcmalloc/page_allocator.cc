@@ -105,6 +105,7 @@ void PageAllocator::ShrinkToUsageLimitSlow(Length n) {
   }
   if (backed <= limits_[kSoft]) {
     // We're already fine.
+    over_limit_ = false;
     return;
   }
 
@@ -115,6 +116,7 @@ void PageAllocator::ShrinkToUsageLimitSlow(Length n) {
   const Length pages = BytesToLengthCeil(overage);
   if (ShrinkHardBy(pages, kSoft)) {
     ++successful_shrinks_after_limit_hit_[kSoft];
+    over_limit_ = false;
     return;
   }
 
@@ -126,6 +128,7 @@ void PageAllocator::ShrinkToUsageLimitSlow(Length n) {
         s.system_bytes - s.unmapped_bytes + tc_globals.metadata_bytes();
     if (backed <= limits_[kHard]) {
       // We're already fine in terms of hard limit.
+      over_limit_ = false;
       return;
     }
     const size_t overage = backed - limits_[kHard];
@@ -134,6 +137,7 @@ void PageAllocator::ShrinkToUsageLimitSlow(Length n) {
       ++successful_shrinks_after_limit_hit_[kHard];
       TC_ASSERT_EQ(successful_shrinks_after_limit_hit_[kHard],
                    limit_hits_[kHard]);
+      over_limit_ = false;
       return;
     }
     const size_t hard_limit = limits_[kHard];
@@ -146,6 +150,8 @@ void PageAllocator::ShrinkToUsageLimitSlow(Length n) {
         ,
         hard_limit);
   }
+
+  over_limit_ = true;
 
   // Print logs once.
   static bool warned = false;
